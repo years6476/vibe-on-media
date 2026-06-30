@@ -6,29 +6,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase/config";
-
-const LANGUAGES = [
-  { code: "us", country: "United States", label: "English" },
-  { code: "gb", country: "United Kingdom", label: "English" },
-  { code: "bd", country: "Bangladesh", label: "বাংলা" },
-  { code: "in", country: "India", label: "हिन्दी" },
-  { code: "sa", country: "Saudi Arabia", label: "العربية" },
-  { code: "fr", country: "France", label: "Français" },
-  { code: "de", country: "Germany", label: "Deutsch" },
-  { code: "es", country: "Spain", label: "Español" },
-  { code: "it", country: "Italy", label: "Italiano" },
-  { code: "pt", country: "Portugal", label: "Português" },
-  { code: "ru", country: "Russia", label: "Русский" },
-  { code: "cn", country: "China", label: "中文" },
-  { code: "jp", country: "Japan", label: "日本語" },
-  { code: "kr", country: "South Korea", label: "한국어" },
-  { code: "tr", country: "Turkey", label: "Türkçe" },
-  { code: "id", country: "Indonesia", label: "Bahasa Indonesia" },
-  { code: "pk", country: "Pakistan", label: "اردو" },
-  { code: "vn", country: "Vietnam", label: "Tiếng Việt" },
-  { code: "th", country: "Thailand", label: "ไทย" },
-  { code: "ng", country: "Nigeria", label: "English" },
-] as const;
+import { COUNTRIES, type CountryOption } from "@/lib/i18n/countries";
+import { getTranslation } from "@/lib/i18n/useTranslation";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -39,7 +18,12 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState<(typeof LANGUAGES)[number]>(LANGUAGES[0]);
+  const [selectedCountry, setSelectedCountry] = useState<CountryOption>(
+    COUNTRIES.find((c) => c.code === "bd") ?? COUNTRIES[0]
+  );
+
+  const t = getTranslation(selectedCountry.langCode);
+  const isRtl = selectedCountry.langCode === "ar" || selectedCountry.langCode === "ur" || selectedCountry.langCode === "fa";
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -56,33 +40,33 @@ export default function LoginPage() {
         code === "auth/wrong-password" ||
         code === "auth/user-not-found"
       ) {
-        setError("ইমেইল বা পাসওয়ার্ড ভুল হয়েছে।");
+        setError(t.errorInvalidCredential);
       } else if (code === "auth/too-many-requests") {
-        setError("অনেকবার চেষ্টা করা হয়েছে। কিছুক্ষণ পর আবার চেষ্টা করুন।");
+        setError(t.errorTooManyRequests);
       } else {
-        setError("লগইন করা যায়নি। আবার চেষ্টা করুন।");
+        setError(t.errorGeneric);
       }
       setLoading(false);
     }
   }
 
   return (
-    <main className="min-h-screen bg-white flex flex-col">
+    <main className="min-h-screen bg-white flex flex-col" dir={isRtl ? "rtl" : "ltr"}>
       {/* Top bar */}
       <div className="w-full max-w-2xl mx-auto px-5 sm:px-8 pt-5 flex items-center justify-between">
+
         {/* Help */}
         <Link
           href="/help"
           className="flex items-center gap-1.5 text-zinc-600 hover:text-zinc-800 transition-colors"
         >
-          <span className="flex items-center justify-center w-7 h-7 rounded-full border border-zinc-300">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" />
-              <line x1="12" y1="17" x2="12.01" y2="17" />
+          <span className="flex items-center justify-center w-9 h-9 rounded-full border border-zinc-300">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+              <circle cx="12" cy="17" r="0.5" fill="currentColor" />
             </svg>
           </span>
-          <span className="text-sm font-medium">Help</span>
+          <span className="text-sm font-medium">{t.help}</span>
         </Link>
 
         {/* Language selector */}
@@ -90,47 +74,51 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => setLangOpen(!langOpen)}
-            className="flex items-center gap-1.5 border border-zinc-300 rounded-full pl-3 pr-2.5 py-1.5 text-zinc-700 hover:border-zinc-400 transition-colors"
+            className="flex items-center gap-1.5 border border-zinc-300 rounded-full pl-2.5 pr-2 py-1 text-zinc-700 hover:border-zinc-400 transition-colors"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="12" cy="12" r="10" />
               <line x1="2" y1="12" x2="22" y2="12" />
               <path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z" />
             </svg>
-            <span className="text-sm font-medium">{selectedLanguage.label}</span>
+            <span className="text-xs font-medium max-w-[72px] truncate">{selectedCountry.label}</span>
             <svg
-              width="14"
-              height="14"
+              width="12"
+              height="12"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
-              className={`transition-transform ${langOpen ? "rotate-180" : ""}`}
+              className={`transition-transform flex-shrink-0 ${langOpen ? "rotate-180" : ""}`}
             >
               <polyline points="6 9 12 15 18 9" />
             </svg>
           </button>
 
           {langOpen && (
-            <div className="absolute right-0 top-full mt-2 w-56 max-h-72 overflow-y-auto bg-white border border-zinc-200 rounded-xl shadow-lg z-30 py-1.5">
-              {LANGUAGES.map((lang) => (
-                <button
-                  key={lang.code}
-                  type="button"
-                  onClick={() => {
-                    setSelectedLanguage(lang);
-                    setLangOpen(false);
-                  }}
-                  className={`w-full text-left px-4 py-2.5 text-sm hover:bg-zinc-50 transition-colors ${
-                    lang.code === selectedLanguage.code
-                      ? "text-violet-600 font-medium"
-                      : "text-zinc-700"
-                  }`}
-                >
-                  {lang.country} ({lang.label})
-                </button>
-              ))}
-            </div>
+            <>
+              <div className="fixed inset-0 z-20" onClick={() => setLangOpen(false)} />
+              <div className="absolute right-0 top-full mt-1.5 w-44 max-h-64 overflow-y-auto bg-white border border-zinc-200 rounded-xl shadow-lg z-30 py-1">
+                {COUNTRIES.map((country) => (
+                  <button
+                    key={country.code}
+                    type="button"
+                    onClick={() => {
+                      setSelectedCountry(country);
+                      setLangOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-50 transition-colors leading-tight ${
+                      country.code === selectedCountry.code
+                        ? "text-violet-600 font-semibold"
+                        : "text-zinc-700"
+                    }`}
+                  >
+                    <span className="font-medium">{country.country}</span>
+                    <span className="text-zinc-400 ml-1">({country.label})</span>
+                  </button>
+                ))}
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -139,24 +127,24 @@ export default function LoginPage() {
         <div className="w-full max-w-[380px]">
 
           {/* Logo */}
-          <div className="text-center mt-2 mb-4">
+          <div className="text-center mt-2 mb-5">
             <Image
               src="/vibe-logo.png"
               alt="Vibe"
-              width={220}
-              height={106}
+              width={330}
+              height={160}
               priority
-              className="mx-auto h-auto w-[100px] sm:w-[115px]"
+              className="mx-auto h-auto w-[160px] sm:w-[190px]"
             />
           </div>
 
           {/* Welcome text */}
           <div className="text-center mb-8">
-            <h1 className="text-zinc-900 text-[26px] sm:text-3xl font-bold tracking-tight">
-              Welcome back! 👋
+            <h1 className="text-zinc-900 text-[22px] sm:text-[24px] font-semibold tracking-tight">
+              {t.welcomeTitle}
             </h1>
-            <p className="text-zinc-400 text-base mt-2">
-              Log in to continue your journey
+            <p className="text-zinc-400 text-sm mt-1.5">
+              {t.welcomeSubtitle}
             </p>
           </div>
 
@@ -170,14 +158,11 @@ export default function LoginPage() {
           {/* Form */}
           <form onSubmit={handleLogin} className="space-y-5">
             <div>
-              <label
-                htmlFor="email"
-                className="block text-zinc-800 text-[15px] font-bold mb-2.5"
-              >
-                Email
+              <label htmlFor="email" className="block text-zinc-800 text-[15px] font-semibold mb-2.5">
+                {t.emailLabel}
               </label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-violet-600">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-900">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <rect x="2" y="4" width="20" height="16" rx="2" />
                     <path d="M22 6l-10 7L2 6" />
@@ -186,7 +171,7 @@ export default function LoginPage() {
                 <input
                   id="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={t.emailPlaceholder}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -198,12 +183,12 @@ export default function LoginPage() {
 
             <div>
               <div className="flex items-center justify-between mb-2.5">
-                <label htmlFor="password" className="text-zinc-800 text-[15px] font-bold">
-                  Password
+                <label htmlFor="password" className="text-zinc-800 text-[15px] font-semibold">
+                  {t.passwordLabel}
                 </label>
               </div>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-violet-600">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-900">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <rect x="3" y="11" width="18" height="11" rx="2" />
                     <path d="M7 11V7a5 5 0 0110 0v4" />
@@ -212,7 +197,7 @@ export default function LoginPage() {
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
+                  placeholder={t.passwordPlaceholder}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -223,7 +208,7 @@ export default function LoginPage() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors"
-                  aria-label={showPassword ? "পাসওয়ার্ড লুকান" : "পাসওয়ার্ড দেখান"}
+                  aria-label={showPassword ? t.hidePassword : t.showPassword}
                 >
                   {showPassword ? (
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -244,29 +229,28 @@ export default function LoginPage() {
             <div className="text-right">
               <Link
                 href="/forgot-password"
-                className="text-violet-600 text-[15px] font-medium hover:text-violet-700 transition-colors"
+                className="text-zinc-900 text-[14px] font-medium hover:text-zinc-600 transition-colors"
               >
-                Forgot password?
+                {t.forgotPassword}
               </Link>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-violet-600 hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-[8px] py-3 text-base transition-colors"
+              className="w-full bg-zinc-900 hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-[8px] py-3 text-base transition-colors"
             >
-              {loading ? "Logging in..." : "Login"}
+              {loading ? t.loggingIn : t.loginButton}
             </button>
           </form>
 
-          {/* Sign up link */}
-          <p className="text-center text-zinc-400 text-[15px] mt-6">
-            Don&apos;t have an account?{" "}
+          <p className="text-center text-zinc-400 text-[14px] mt-6">
+            {t.noAccount}{" "}
             <Link
               href="/signup"
-              className="text-violet-600 hover:text-violet-700 font-bold transition-colors"
+              className="text-zinc-900 hover:text-zinc-600 font-bold transition-colors"
             >
-              Sign up
+              {t.signUp}
             </Link>
           </p>
 
