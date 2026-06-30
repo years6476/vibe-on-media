@@ -131,7 +131,7 @@ export default function LoginPage() {
           </div>
 
           {/* Welcome text — লোগোর কাছে */}
-          <div className="text-center mb-6 mt-1">
+          <div className="text-center mb-6 -mt-4">
             <h1 className="text-zinc-900 text-[22px] sm:text-[24px] font-semibold tracking-tight">
               {t.welcomeTitle}
             </h1>
