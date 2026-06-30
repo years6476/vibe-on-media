@@ -7,6 +7,29 @@ import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase/config";
 
+const LANGUAGES = [
+  { code: "us", country: "United States", label: "English" },
+  { code: "gb", country: "United Kingdom", label: "English" },
+  { code: "bd", country: "Bangladesh", label: "বাংলা" },
+  { code: "in", country: "India", label: "हिन्दी" },
+  { code: "sa", country: "Saudi Arabia", label: "العربية" },
+  { code: "fr", country: "France", label: "Français" },
+  { code: "de", country: "Germany", label: "Deutsch" },
+  { code: "es", country: "Spain", label: "Español" },
+  { code: "it", country: "Italy", label: "Italiano" },
+  { code: "pt", country: "Portugal", label: "Português" },
+  { code: "ru", country: "Russia", label: "Русский" },
+  { code: "cn", country: "China", label: "中文" },
+  { code: "jp", country: "Japan", label: "日本語" },
+  { code: "kr", country: "South Korea", label: "한국어" },
+  { code: "tr", country: "Turkey", label: "Türkçe" },
+  { code: "id", country: "Indonesia", label: "Bahasa Indonesia" },
+  { code: "pk", country: "Pakistan", label: "اردو" },
+  { code: "vn", country: "Vietnam", label: "Tiếng Việt" },
+  { code: "th", country: "Thailand", label: "ไทย" },
+  { code: "ng", country: "Nigeria", label: "English" },
+] as const;
+
 export default function LoginPage() {
   const router = useRouter();
 
@@ -15,6 +38,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState(LANGUAGES[0]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -44,13 +69,70 @@ export default function LoginPage() {
   return (
     <main className="min-h-screen bg-white flex flex-col">
       {/* Top bar */}
-      <div className="w-full max-w-2xl mx-auto px-6 sm:px-8 pt-6 flex justify-end">
+      <div className="w-full max-w-2xl mx-auto px-5 sm:px-8 pt-5 flex items-center justify-between">
+        {/* Help */}
         <Link
           href="/help"
-          className="text-violet-600 text-base font-medium hover:text-violet-700 transition-colors"
+          className="flex items-center gap-1.5 text-zinc-600 hover:text-zinc-800 transition-colors"
         >
-          Help?
+          <span className="flex items-center justify-center w-7 h-7 rounded-full border border-zinc-300">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+          </span>
+          <span className="text-sm font-medium">Help</span>
         </Link>
+
+        {/* Language selector */}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setLangOpen(!langOpen)}
+            className="flex items-center gap-1.5 border border-zinc-300 rounded-full pl-3 pr-2.5 py-1.5 text-zinc-700 hover:border-zinc-400 transition-colors"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="2" y1="12" x2="22" y2="12" />
+              <path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z" />
+            </svg>
+            <span className="text-sm font-medium">{selectedLanguage.label}</span>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className={`transition-transform ${langOpen ? "rotate-180" : ""}`}
+            >
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+
+          {langOpen && (
+            <div className="absolute right-0 top-full mt-2 w-56 max-h-72 overflow-y-auto bg-white border border-zinc-200 rounded-xl shadow-lg z-30 py-1.5">
+              {LANGUAGES.map((lang) => (
+                <button
+                  key={lang.code}
+                  type="button"
+                  onClick={() => {
+                    setSelectedLanguage(lang);
+                    setLangOpen(false);
+                  }}
+                  className={`w-full text-left px-4 py-2.5 text-sm hover:bg-zinc-50 transition-colors ${
+                    lang.code === selectedLanguage.code
+                      ? "text-violet-600 font-medium"
+                      : "text-zinc-700"
+                  }`}
+                >
+                  {lang.country} ({lang.label})
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex-1 flex flex-col items-center px-6 sm:px-8 pt-8 sm:pt-12">
@@ -188,16 +270,6 @@ export default function LoginPage() {
             </Link>
           </p>
 
-          {/* Bottom illustration */}
-          <div className="relative mt-10 mb-2 -mx-6 sm:-mx-8">
-            <Image
-              src="/vibe-bottom-illustration.png"
-              alt=""
-              width={760}
-              height={320}
-              className="w-full h-auto"
-            />
-          </div>
         </div>
       </div>
     </main>
