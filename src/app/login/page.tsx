@@ -39,7 +39,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState(LANGUAGES[0]);
+  const [selectedLanguage, setSelectedLanguage] = useState<(typeof LANGUAGES)[number]>(LANGUAGES[0]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
