@@ -56,18 +56,18 @@ export default function LoginPage() {
       {/* Top bar */}
       <div className="w-full max-w-2xl mx-auto px-5 sm:px-8 pt-4 flex items-center justify-between">
 
-        {/* Help — সার্কল ছোট, question mark বড়, opacity বেশি */}
+        {/* Help — সার্কল ছোট, ? বড়, opacity বেশি, hover এ underline */}
         <Link
           href="/help"
-          className="flex items-center gap-1.5 text-zinc-700 hover:text-zinc-900 transition-colors"
+          className="flex items-center gap-1.5 text-zinc-700 hover:text-zinc-900 transition-colors group"
         >
           <span className="flex items-center justify-center w-7 h-7 rounded-full border-2 border-zinc-500 bg-zinc-50">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
               <circle cx="12" cy="17" r="0.6" fill="currentColor" />
             </svg>
           </span>
-          <span className="text-sm font-medium">{t.help}</span>
+          <span className="text-sm font-medium group-hover:underline underline-offset-2">{t.help}</span>
         </Link>
 
         {/* Language selector */}
@@ -114,12 +114,12 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Main content — উপরে তোলা */}
+      {/* Main content */}
       <div className="flex-1 flex flex-col items-center px-6 sm:px-8 pt-4 sm:pt-6">
         <div className="w-full max-w-[380px]">
 
-          {/* Logo — আরো বড় */}
-          <div className="text-center mb-4">
+          {/* Logo — একটু নিচে */}
+          <div className="text-center mt-5 mb-3">
             <Image
               src="/vibe-logo.png"
               alt="Vibe"
@@ -130,12 +130,12 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* Welcome text */}
-          <div className="text-center mb-6">
+          {/* Welcome text — লোগোর কাছে */}
+          <div className="text-center mb-6 mt-1">
             <h1 className="text-zinc-900 text-[22px] sm:text-[24px] font-semibold tracking-tight">
               {t.welcomeTitle}
             </h1>
-            <p className="text-zinc-400 text-sm mt-1.5">
+            <p className="text-zinc-400 text-sm mt-1">
               {t.welcomeSubtitle}
             </p>
           </div>
@@ -216,11 +216,11 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Forgot password */}
+            {/* Forgot password — hover এ underline */}
             <div className="text-right">
               <Link
                 href="/forgot-password"
-                className="text-zinc-900 text-[14px] font-medium hover:text-zinc-600 transition-colors"
+                className="text-zinc-900 text-[14px] font-medium hover:underline underline-offset-2 transition-colors"
               >
                 {t.forgotPassword}
               </Link>
@@ -243,7 +243,7 @@ export default function LoginPage() {
             <div className="flex-1 h-px bg-zinc-200" />
           </div>
 
-          {/* Create new account button */}
+          {/* Create new account */}
           <Link
             href="/signup"
             className="flex items-center justify-center w-full border-2 border-zinc-200 hover:border-zinc-400 text-zinc-800 font-semibold rounded-full py-2.5 text-[15px] transition-colors hover:bg-zinc-50"
