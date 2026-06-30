@@ -115,23 +115,24 @@ export default function LoginPage() {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col items-center px-6 sm:px-8 pt-4 sm:pt-6">
+      <div className="flex-1 flex flex-col items-center px-6 sm:px-8 pt-1 sm:pt-2">
         <div className="w-full max-w-[380px]">
 
-          {/* Logo — একটু নিচে */}
-          <div className="text-center mt-10 mb-3">
+          {/* Logo */}
+          <div className="text-center mt-4 mb-3">
             <Image
               src="/vibe-logo.png"
               alt="Vibe"
               width={440}
               height={220}
               priority
-              className="mx-auto h-auto w-[210px] sm:w-[240px]"
+              sizes="(max-width: 640px) 210px, 240px"
+              className="mx-auto w-[210px] sm:w-[240px] aspect-[2/1] object-contain"
             />
           </div>
 
-          {/* Welcome text — লোগোর কাছে */}
-          <div className="text-center mb-6 -mt-4">
+          {/* Welcome text */}
+          <div className="text-center mb-6 -mt-1">
             <h1 className="text-zinc-900 text-[22px] sm:text-[24px] font-semibold tracking-tight">
               {t.welcomeTitle}
             </h1>
