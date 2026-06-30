@@ -53,18 +53,18 @@ export default function LoginPage() {
         </Link>
       </div>
 
-      <div className="flex-1 flex flex-col items-center px-6 sm:px-8">
+      <div className="flex-1 flex flex-col items-center px-6 sm:px-8 pt-8 sm:pt-12">
         <div className="w-full max-w-[380px]">
 
           {/* Logo */}
-          <div className="text-center mt-2 mb-5">
+          <div className="text-center mt-2 mb-4">
             <Image
               src="/vibe-logo.png"
               alt="Vibe"
               width={220}
               height={106}
               priority
-              className="mx-auto h-auto w-[130px] sm:w-[150px]"
+              className="mx-auto h-auto w-[100px] sm:w-[115px]"
             />
           </div>
 
@@ -109,7 +109,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   autoComplete="email"
-                  className="w-full bg-white border border-zinc-200 text-zinc-900 placeholder-zinc-400 rounded-xl pl-12 pr-4 py-3.5 text-[15px] focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-colors"
+                  className="w-full bg-white border border-zinc-200 text-zinc-900 placeholder-zinc-400 rounded-[8px] pl-12 pr-4 py-2.5 text-[15px] focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-colors"
                 />
               </div>
             </div>
@@ -135,7 +135,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   autoComplete="current-password"
-                  className="w-full bg-white border border-zinc-200 text-zinc-900 placeholder-zinc-400 rounded-xl pl-12 pr-12 py-3.5 text-[15px] focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-colors"
+                  className="w-full bg-white border border-zinc-200 text-zinc-900 placeholder-zinc-400 rounded-[8px] pl-12 pr-12 py-2.5 text-[15px] focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-colors"
                 />
                 <button
                   type="button"
@@ -171,7 +171,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-violet-600 hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl py-4 text-base transition-colors"
+              className="w-full bg-violet-600 hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-[8px] py-3 text-base transition-colors"
             >
               {loading ? "Logging in..." : "Login"}
             </button>
