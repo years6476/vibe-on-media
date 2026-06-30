@@ -52,18 +52,19 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen bg-white flex flex-col" dir={isRtl ? "rtl" : "ltr"}>
-      {/* Top bar */}
-      <div className="w-full max-w-2xl mx-auto px-5 sm:px-8 pt-5 flex items-center justify-between">
 
-        {/* Help */}
+      {/* Top bar */}
+      <div className="w-full max-w-2xl mx-auto px-5 sm:px-8 pt-4 flex items-center justify-between">
+
+        {/* Help — সার্কল ছোট, question mark বড়, opacity বেশি */}
         <Link
           href="/help"
-          className="flex items-center gap-1.5 text-zinc-600 hover:text-zinc-800 transition-colors"
+          className="flex items-center gap-1.5 text-zinc-700 hover:text-zinc-900 transition-colors"
         >
-          <span className="flex items-center justify-center w-9 h-9 rounded-full border border-zinc-300">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <span className="flex items-center justify-center w-7 h-7 rounded-full border-2 border-zinc-500 bg-zinc-50">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-              <circle cx="12" cy="17" r="0.5" fill="currentColor" />
+              <circle cx="12" cy="17" r="0.6" fill="currentColor" />
             </svg>
           </span>
           <span className="text-sm font-medium">{t.help}</span>
@@ -81,14 +82,9 @@ export default function LoginPage() {
               <line x1="2" y1="12" x2="22" y2="12" />
               <path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z" />
             </svg>
-            <span className="text-xs font-medium max-w-[72px] truncate">{selectedCountry.label}</span>
+            <span className="text-xs font-medium">{selectedCountry.label}</span>
             <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
+              width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
               className={`transition-transform flex-shrink-0 ${langOpen ? "rotate-180" : ""}`}
             >
               <polyline points="6 9 12 15 18 9" />
@@ -103,14 +99,9 @@ export default function LoginPage() {
                   <button
                     key={country.code}
                     type="button"
-                    onClick={() => {
-                      setSelectedCountry(country);
-                      setLangOpen(false);
-                    }}
+                    onClick={() => { setSelectedCountry(country); setLangOpen(false); }}
                     className={`w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-50 transition-colors leading-tight ${
-                      country.code === selectedCountry.code
-                        ? "text-violet-600 font-semibold"
-                        : "text-zinc-700"
+                      country.code === selectedCountry.code ? "text-violet-600 font-semibold" : "text-zinc-700"
                     }`}
                   >
                     <span className="font-medium">{country.country}</span>
@@ -123,23 +114,24 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col items-center px-6 sm:px-8 pt-8 sm:pt-12">
+      {/* Main content — উপরে তোলা */}
+      <div className="flex-1 flex flex-col items-center px-6 sm:px-8 pt-4 sm:pt-6">
         <div className="w-full max-w-[380px]">
 
-          {/* Logo */}
-          <div className="text-center mt-2 mb-5">
+          {/* Logo — আরো বড় */}
+          <div className="text-center mb-4">
             <Image
               src="/vibe-logo.png"
               alt="Vibe"
-              width={330}
-              height={160}
+              width={440}
+              height={220}
               priority
-              className="mx-auto h-auto w-[160px] sm:w-[190px]"
+              className="mx-auto h-auto w-[210px] sm:w-[240px]"
             />
           </div>
 
           {/* Welcome text */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
             <h1 className="text-zinc-900 text-[22px] sm:text-[24px] font-semibold tracking-tight">
               {t.welcomeTitle}
             </h1>
@@ -156,9 +148,9 @@ export default function LoginPage() {
           )}
 
           {/* Form */}
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-zinc-800 text-[15px] font-semibold mb-2.5">
+              <label htmlFor="email" className="block text-zinc-800 text-[15px] font-semibold mb-2">
                 {t.emailLabel}
               </label>
               <div className="relative">
@@ -182,11 +174,9 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-2.5">
-                <label htmlFor="password" className="text-zinc-800 text-[15px] font-semibold">
-                  {t.passwordLabel}
-                </label>
-              </div>
+              <label htmlFor="password" className="block text-zinc-800 text-[15px] font-semibold mb-2">
+                {t.passwordLabel}
+              </label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-900">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -226,6 +216,7 @@ export default function LoginPage() {
               </div>
             </div>
 
+            {/* Forgot password */}
             <div className="text-right">
               <Link
                 href="/forgot-password"
@@ -235,6 +226,7 @@ export default function LoginPage() {
               </Link>
             </div>
 
+            {/* Login button */}
             <button
               type="submit"
               disabled={loading}
@@ -244,15 +236,20 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="text-center text-zinc-400 text-[14px] mt-6">
-            {t.noAccount}{" "}
-            <Link
-              href="/signup"
-              className="text-zinc-900 hover:text-zinc-600 font-bold transition-colors"
-            >
-              {t.signUp}
-            </Link>
-          </p>
+          {/* OR divider */}
+          <div className="flex items-center gap-3 my-4">
+            <div className="flex-1 h-px bg-zinc-200" />
+            <span className="text-zinc-400 text-xs font-medium">or</span>
+            <div className="flex-1 h-px bg-zinc-200" />
+          </div>
+
+          {/* Create new account button */}
+          <Link
+            href="/signup"
+            className="flex items-center justify-center w-full border-2 border-zinc-200 hover:border-zinc-400 text-zinc-800 font-semibold rounded-full py-2.5 text-[15px] transition-colors hover:bg-zinc-50"
+          >
+            Create new account
+          </Link>
 
         </div>
       </div>
