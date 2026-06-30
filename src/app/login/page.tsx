@@ -61,7 +61,7 @@ export default function LoginPage() {
           href="/help"
           className="flex items-center gap-1.5 text-zinc-700 hover:text-zinc-900 transition-colors group"
         >
-          <span className="flex items-center justify-center w-7 h-7 rounded-full border-2 border-zinc-500 bg-zinc-50">
+          <span className="flex items-center justify-center w-6 h-6 rounded-full border-2 border-zinc-500 bg-zinc-50">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
               <circle cx="12" cy="17" r="0.6" fill="currentColor" />
@@ -119,7 +119,7 @@ export default function LoginPage() {
         <div className="w-full max-w-[380px]">
 
           {/* Logo — একটু নিচে */}
-          <div className="text-center mt-5 mb-3">
+          <div className="text-center mt-10 mb-3">
             <Image
               src="/vibe-logo.png"
               alt="Vibe"
