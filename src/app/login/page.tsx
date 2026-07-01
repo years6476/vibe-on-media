@@ -128,7 +128,7 @@ export default function LoginPage() {
       </div>
 
       {/* Main content — একটু নিচে */}
-      <div className="flex-1 flex flex-col items-center px-6 sm:px-8 pt-6">
+      <div className="flex-1 flex flex-col items-center px-6 sm:px-8 pt-14">
         <div className="w-full max-w-[380px]">
 
           {/* Logo */}
@@ -237,10 +237,8 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-[8px] py-3 text-base transition-opacity"
-              style={{
-                background: "linear-gradient(to right, #6A11CB, #7B2FF7, #A855F7)",
-              }}
+              className="block mx-auto w-full max-w-[280px] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-[8px] py-3 text-base transition-opacity"
+              style={{ background: "linear-gradient(to right, #6A11CB, #7B2FF7, #A855F7)" }}
             >
               {loading ? t.loggingIn : t.loginButton}
             </button>
@@ -257,10 +255,7 @@ export default function LoginPage() {
           <Link
             href="/signup"
             className="flex items-center justify-center w-full font-semibold rounded-full py-2.5 text-[15px] transition-colors hover:bg-purple-50"
-            style={{
-              border: "1px solid #A855F7",
-              color: "#7B2FF7",
-            }}
+            style={{ border: "1px solid #C084FC", color: "#7B2FF7" }}
           >
             Create new account
           </Link>
