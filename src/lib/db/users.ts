@@ -1,51 +1,53 @@
 /**
  * src/lib/db/users.ts
  *
- * User সংক্রান্ত সব database operation এখানে।
- * Firebase এবং VPS (REST API) দুটো implementation ই এক ফাইলে রাখা আছে।
- * adapter.ts এ DB_ADAPTER = "api" করলেই VPS mode এ চলে যাবে।
+ * ─── Firebase Realtime Database structure ────────────────────────────────────
  *
- * ─── Data structure (Firebase Realtime DB) ───────────────────────────────────
+ * এই exact structure এ Firebase এ data সেভ হবে।
+ * VPS নিলে এই JSON structure হুবহু MongoDB / PostgreSQL এ import হবে।
+ * uid গুলো primary key হিসেবে কাজ করে — তাই কোনো reference ভাঙবে না।
  *
  * users/
  *   {uid}/
- *     uid            : string
+ *     uid            : string        ← Firebase Auth UID (primary key)
  *     firstName      : string
- *     middleName     : string   (empty string if not provided)
+ *     middleName     : string        ← "" যদি না দেয়
  *     lastName       : string
- *     displayName    : string   (firstName + middleName + lastName)
+ *     displayName    : string        ← firstName + middleName + lastName
  *     email          : string
- *     username       : string   (lowercase, unique)
- *     dateOfBirth    : string   ("YYYY-MM-DD")
- *     gender         : string
- *     createdAt      : string   (ISO 8601)
- *     avatarUrl      : string | null
- *     bio            : string
- *     followers      : number
- *     following      : number
+ *     username       : string        ← lowercase, unique
+ *     dateOfBirth    : string        ← "YYYY-MM-DD"
+ *     gender         : string        ← "male" | "female" | "other" | "prefer_not_to_say"
+ *     createdAt      : string        ← ISO 8601 (2025-01-15T10:30:00.000Z)
+ *     avatarUrl      : string | null ← Cloudinary URL
+ *     bio            : string        ← ""
+ *     followers      : number        ← 0
+ *     following      : number        ← 0
  *
  * usernames/
- *   {username}       : string (uid)   ← unique lookup index
+ *   {username}       : string (uid)  ← unique lookup index
+ *                                       VPS এ এটা users table এর unique index হবে
  *
- * ─── VPS তে migrate করতে হলে ────────────────────────────────────────────────
+ * ─── Export করার নিয়ম (VPS নেওয়ার সময়) ─────────────────────────────────────
  *
- * ১. MongoDB তে "users" collection বানাও।
- *    Schema উপরের structure এর মতোই থাকবে।
+ * Firebase Realtime DB:
+ *   Firebase Console → Realtime Database → ⋮ → Export JSON
+ *   "users" object → MongoDB "users" collection এ import
+ *   "usernames" object → index হিসেবে রাখো
  *
- * ২. Firebase Realtime DB থেকে export:
- *    Firebase Console → Realtime Database → ⋮ → Export JSON
- *    এই JSON এর "users" object টা MongoDB এ import করো।
- *    uid গুলো MongoDB এর _id হিসেবে রাখো — তাহলে কোনো reference ভাঙবে না।
+ * Firebase Auth (user list):
+ *   Terminal: firebase auth:export users_auth.json --format=json
+ *   uid + email mapping টা নিজের auth system এ রাখো
  *
- * ৩. Firebase Auth থেকে user list export:
- *    firebase auth:export users.json --format=json (Firebase CLI)
- *    এই data থেকে email + uid mapping টা নিজের auth system এ রাখো।
- *
- * ৪. adapter.ts এ DB_ADAPTER = "api" করো।
- *    নিচের api: {} block এর functions গুলো কাজ করবে।
+ * Cloudinary (media files):
+ *   Cloudinary Console → Media Library → Download All
+ *   অথবা Cloudinary API দিয়ে batch download
+ *   প্রতিটা file এর public_id = uid/filename format এ রাখা আছে
+ *   নিজের storage এ একই folder structure এ রাখো → avatarUrl গুলো শুধু domain বদলাবে
  */
 
-import { DB_ADAPTER, API_BASE_URL } from "./adapter";
+import { DB_ADAPTER } from "./adapter";
+import { app } from "@/lib/firebase/config";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -55,9 +57,9 @@ export type NewUser = {
   lastName: string;
   email: string;
   password: string;
-  dateOfBirth: string; // "YYYY-MM-DD"
+  dateOfBirth: string;
   gender: "male" | "female" | "other" | "prefer_not_to_say";
-  username: string;   // lowercase, already validated
+  username: string;
 };
 
 export type UserProfile = {
@@ -77,12 +79,11 @@ export type UserProfile = {
   following: number;
 };
 
-// ─── Firebase implementation ──────────────────────────────────────────────────
+// ─── Firebase ─────────────────────────────────────────────────────────────────
 
 const firebase = {
   async isUsernameTaken(username: string): Promise<boolean> {
     const { getDatabase, ref, get } = await import("firebase/database");
-    const { app } = await import("@/lib/firebase/config");
     const db = getDatabase(app);
     const snap = await get(ref(db, `usernames/${username}`));
     return snap.exists();
@@ -92,12 +93,10 @@ const firebase = {
     const { getAuth, createUserWithEmailAndPassword, updateProfile } =
       await import("firebase/auth");
     const { getDatabase, ref, set } = await import("firebase/database");
-    const { app } = await import("@/lib/firebase/config");
 
     const auth = getAuth(app);
     const db = getDatabase(app);
 
-    // ১. Firebase Auth এ account বানাও
     const credential = await createUserWithEmailAndPassword(
       auth,
       data.email,
@@ -109,7 +108,6 @@ const firebase = {
       .filter(Boolean)
       .join(" ");
 
-    // ২. Auth profile এ displayName সেট করো
     await updateProfile(credential.user, { displayName });
 
     const profile: UserProfile = {
@@ -129,11 +127,10 @@ const firebase = {
       following: 0,
     };
 
-    // ৩. Realtime DB তে user profile সেভ করো
-    //    এই exact structure টাই VPS এ migrate হবে
+    // users/{uid} — main profile
     await set(ref(db, `users/${uid}`), profile);
 
-    // ৪. Username → uid index (unique lookup)
+    // usernames/{username} → uid — unique index
     await set(ref(db, `usernames/${data.username}`), uid);
 
     return profile;
@@ -141,7 +138,6 @@ const firebase = {
 
   async getUserById(uid: string): Promise<UserProfile | null> {
     const { getDatabase, ref, get } = await import("firebase/database");
-    const { app } = await import("@/lib/firebase/config");
     const db = getDatabase(app);
     const snap = await get(ref(db, `users/${uid}`));
     return snap.exists() ? (snap.val() as UserProfile) : null;
@@ -149,64 +145,34 @@ const firebase = {
 
   async updateUser(uid: string, updates: Partial<UserProfile>): Promise<void> {
     const { getDatabase, ref, update } = await import("firebase/database");
-    const { app } = await import("@/lib/firebase/config");
     const db = getDatabase(app);
     await update(ref(db, `users/${uid}`), updates);
   },
 };
 
-// ─── VPS / REST API implementation ───────────────────────────────────────────
-// VPS কিনলে এই block টা fill করো। adapter.ts এ DB_ADAPTER = "api" করো।
+// ─── VPS placeholder (VPS নেওয়ার সময় এখানে কাজ করবো) ──────────────────────
 
 const api = {
-  async isUsernameTaken(username: string): Promise<boolean> {
-    const res = await fetch(
-      `${API_BASE_URL}/api/users/check-username?username=${username}`
-    );
-    const data = await res.json();
-    return data.taken as boolean;
+  isUsernameTaken: (_username: string): Promise<boolean> => {
+    throw new Error("VPS adapter not implemented yet");
   },
-
-  async createUser(data: NewUser): Promise<UserProfile> {
-    const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    if (!res.ok) {
-      const err = await res.json();
-      throw Object.assign(new Error(err.message), { code: err.code });
-    }
-    return res.json() as Promise<UserProfile>;
+  createUser: (_data: NewUser): Promise<UserProfile> => {
+    throw new Error("VPS adapter not implemented yet");
   },
-
-  async getUserById(uid: string): Promise<UserProfile | null> {
-    const res = await fetch(`${API_BASE_URL}/api/users/${uid}`);
-    if (!res.ok) return null;
-    return res.json() as Promise<UserProfile>;
+  getUserById: (_uid: string): Promise<UserProfile | null> => {
+    throw new Error("VPS adapter not implemented yet");
   },
-
-  async updateUser(uid: string, updates: Partial<UserProfile>): Promise<void> {
-    await fetch(`${API_BASE_URL}/api/users/${uid}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updates),
-    });
+  updateUser: (_uid: string, _updates: Partial<UserProfile>): Promise<void> => {
+    throw new Error("VPS adapter not implemented yet");
   },
 };
 
-// ─── Exported functions (adapter দেখে সঠিক implementation ব্যবহার করে) ──────
+// ─── Exports ──────────────────────────────────────────────────────────────────
 
 const impl = DB_ADAPTER === "firebase" ? firebase : api;
 
-export const isUsernameTaken = (username: string) =>
-  impl.isUsernameTaken(username);
-
-export const createUser = (data: NewUser) =>
-  impl.createUser(data);
-
-export const getUserById = (uid: string) =>
-  impl.getUserById(uid);
-
-export const updateUser = (uid: string, updates: Partial<UserProfile>) =>
+export const isUsernameTaken = (username: string) => impl.isUsernameTaken(username);
+export const createUser      = (data: NewUser)     => impl.createUser(data);
+export const getUserById     = (uid: string)        => impl.getUserById(uid);
+export const updateUser      = (uid: string, updates: Partial<UserProfile>) =>
   impl.updateUser(uid, updates);
