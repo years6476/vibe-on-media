@@ -6,8 +6,29 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase/config";
-import { COUNTRIES, type CountryOption } from "@/lib/i18n/countries";
-import { getTranslation } from "@/lib/i18n/useTranslation";
+
+const LANGUAGES = [
+  { code: "us", country: "United States", label: "English" },
+  { code: "gb", country: "United Kingdom", label: "English" },
+  { code: "bd", country: "Bangladesh", label: "বাংলা" },
+  { code: "in", country: "India", label: "हिन्दी" },
+  { code: "sa", country: "Saudi Arabia", label: "العربية" },
+  { code: "fr", country: "France", label: "Français" },
+  { code: "de", country: "Germany", label: "Deutsch" },
+  { code: "es", country: "Spain", label: "Español" },
+  { code: "it", country: "Italy", label: "Italiano" },
+  { code: "pt", country: "Portugal", label: "Português" },
+  { code: "ru", country: "Russia", label: "Русский" },
+  { code: "cn", country: "China", label: "中文" },
+  { code: "jp", country: "Japan", label: "日本語" },
+  { code: "kr", country: "South Korea", label: "한국어" },
+  { code: "tr", country: "Turkey", label: "Türkçe" },
+  { code: "id", country: "Indonesia", label: "Bahasa Indonesia" },
+  { code: "vn", country: "Vietnam", label: "Tiếng Việt" },
+  { code: "pk", country: "Pakistan", label: "اردو" },
+  { code: "th", country: "Thailand", label: "ไทย" },
+  { code: "ng", country: "Nigeria", label: "English" },
+] as const;
 
 export default function LoginPage() {
   const router = useRouter();
@@ -18,15 +39,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState<CountryOption>(
-    COUNTRIES.find((c) => c.code === "us") ?? COUNTRIES[0]
-  );
-
-  const t = getTranslation(selectedCountry.langCode);
-  const isRtl =
-    selectedCountry.langCode === "ar" ||
-    selectedCountry.langCode === "ur" ||
-    selectedCountry.langCode === "fa";
+  const [selectedLanguage, setSelectedLanguage] = useState<(typeof LANGUAGES)[number]>(LANGUAGES[0]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -43,40 +56,33 @@ export default function LoginPage() {
         code === "auth/wrong-password" ||
         code === "auth/user-not-found"
       ) {
-        setError(t.errorInvalidCredential);
+        setError("ইমেইল বা পাসওয়ার্ড ভুল হয়েছে।");
       } else if (code === "auth/too-many-requests") {
-        setError(t.errorTooManyRequests);
+        setError("অনেকবার চেষ্টা করা হয়েছে। কিছুক্ষণ পর আবার চেষ্টা করুন।");
       } else {
-        setError(t.errorGeneric);
+        setError("লগইন করা যায়নি। আবার চেষ্টা করুন।");
       }
       setLoading(false);
     }
   }
 
   return (
-    <main className="min-h-screen bg-white flex flex-col" dir={isRtl ? "rtl" : "ltr"}>
-
+    <main className="min-h-screen bg-white dark:bg-zinc-950 flex flex-col">
       {/* Top bar */}
-      <div className="w-full max-w-2xl mx-auto px-5 sm:px-8 pt-4 flex items-center justify-between">
-
-        {/* Help — question mark বড় */}
+      <div className="w-full max-w-2xl mx-auto px-5 sm:px-8 pt-5 flex items-center justify-between">
+        {/* Help */}
         <Link
           href="/help"
-          className="flex items-center gap-1.5 text-zinc-700 hover:text-zinc-900 transition-colors group"
+          className="flex items-center gap-1.5 text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors"
         >
-          <span className="flex items-center justify-center w-6 h-6 rounded-full border-2 border-zinc-500 bg-zinc-50">
-            <svg
-              width="20" height="20" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor"
-              strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-            >
-              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-              <circle cx="12" cy="17" r="0.6" fill="currentColor" />
+          <span className="flex items-center justify-center w-7 h-7 rounded-full border border-zinc-300 dark:border-zinc-600">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
             </svg>
           </span>
-          <span className="text-sm font-medium group-hover:underline underline-offset-2">
-            {t.help}
-          </span>
+          <span className="text-sm font-medium">Help</span>
         </Link>
 
         {/* Language selector */}
@@ -84,134 +90,148 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => setLangOpen(!langOpen)}
-            className="flex items-center gap-1.5 border border-zinc-300 rounded-full pl-2.5 pr-2 py-1 text-zinc-700 hover:border-zinc-400 transition-colors"
+            className="flex items-center gap-1.5 border border-zinc-300 dark:border-zinc-600 rounded-full pl-3 pr-2.5 py-1.5 text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-400 transition-colors"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="12" cy="12" r="10" />
               <line x1="2" y1="12" x2="22" y2="12" />
               <path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z" />
             </svg>
-            <span className="text-xs font-medium">{selectedCountry.label}</span>
+            <span className="text-sm font-medium">{selectedLanguage.label}</span>
             <svg
-              width="12" height="12" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" strokeWidth="2"
-              className={`transition-transform flex-shrink-0 ${langOpen ? "rotate-180" : ""}`}
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className={`transition-transform ${langOpen ? "rotate-180" : ""}`}
             >
               <polyline points="6 9 12 15 18 9" />
             </svg>
           </button>
 
           {langOpen && (
-            <>
-              <div className="fixed inset-0 z-20" onClick={() => setLangOpen(false)} />
-              <div className="absolute right-0 top-full mt-1.5 w-44 max-h-64 overflow-y-auto bg-white border border-zinc-200 rounded-xl shadow-lg z-30 py-1">
-                {COUNTRIES.map((country) => (
-                  <button
-                    key={country.code}
-                    type="button"
-                    onClick={() => { setSelectedCountry(country); setLangOpen(false); }}
-                    className={`w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-50 transition-colors leading-tight ${
-                      country.code === selectedCountry.code
-                        ? "font-semibold"
-                        : "text-zinc-700"
-                    }`}
-                    style={country.code === selectedCountry.code ? { color: "#7B2FF7" } : {}}
-                  >
-                    <span className="font-medium">{country.country}</span>
-                    <span className="text-zinc-400 ml-1">({country.label})</span>
-                  </button>
-                ))}
-              </div>
-            </>
+            <div className="absolute right-0 top-full mt-2 w-56 max-h-72 overflow-y-auto bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-lg z-30 py-1.5">
+              {LANGUAGES.map((lang) => (
+                <button
+                  key={lang.code}
+                  type="button"
+                  onClick={() => {
+                    setSelectedLanguage(lang);
+                    setLangOpen(false);
+                  }}
+                  className={`w-full text-left px-4 py-2.5 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors ${
+                    lang.code === selectedLanguage.code
+                      ? "text-violet-600 dark:text-violet-400 font-medium"
+                      : "text-zinc-700 dark:text-zinc-300"
+                  }`}
+                >
+                  {lang.country} ({lang.label})
+                </button>
+              ))}
+            </div>
           )}
         </div>
       </div>
 
-      {/* Main content — একটু নিচে */}
-      <div className="flex-1 flex flex-col items-center px-6 sm:px-8 pt-14">
+      <div className="flex-1 flex flex-col items-center px-6 sm:px-8 pt-8 sm:pt-12">
         <div className="w-full max-w-[380px]">
 
-   
-          {/* Logo */}
-<div className="text-center mt-2 mb-4">
-  <Image
-    src="/socialfeed-logo-light.png"
-    alt="SocialFeed"
-    width={300}
-    height={150}
-    priority
-    className="mx-auto h-auto w-[150px] sm:w-[170px] dark:hidden"
-  />
-  <Image
-    src="/socialfeed-logo-dark.png"
-    alt="SocialFeed"
-    width={300}
-    height={150}
-    priority
-    className="mx-auto h-auto w-[150px] sm:w-[170px] hidden dark:block"
-  />
-</div>
+          {/* Logo — light মোডে কালো লোগো, dark মোডে সাদা লোগো */}
+          <div className="text-center mt-2 mb-4">
+            <Image
+              src="/socialfeed-logo-light.png"
+              alt="SocialFeed"
+              width={300}
+              height={150}
+              priority
+              className="mx-auto h-auto w-[150px] sm:w-[170px] dark:hidden"
+            />
+            <Image
+              src="/socialfeed-logo-dark.png"
+              alt="SocialFeed"
+              width={300}
+              height={150}
+              priority
+              className="mx-auto h-auto w-[150px] sm:w-[170px] hidden dark:block"
+            />
+          </div>
 
           {/* Welcome text */}
-          <div className="text-center mb-5">
-            <h1 className="text-zinc-900 text-[22px] sm:text-[24px] font-semibold tracking-tight">
-              {t.welcomeTitle}
+          <div className="text-center mb-8">
+            <h1 className="text-zinc-900 dark:text-white text-[26px] sm:text-3xl font-bold tracking-tight">
+              Welcome back! 👋
             </h1>
-            <p className="text-zinc-400 text-sm mt-1">
-              {t.welcomeSubtitle}
+            <p className="text-zinc-400 dark:text-zinc-500 text-base mt-2">
+              Log in to continue your journey
             </p>
           </div>
 
           {/* Error */}
           {error && (
-            <div className="bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-4 py-3 mb-4">
+            <div className="bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-4 py-3 mb-5">
               {error}
             </div>
           )}
 
           {/* Form */}
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-5">
             <div>
-              <label htmlFor="email" className="block text-zinc-800 text-[15px] font-semibold mb-2">
-                {t.emailLabel}
+              <label
+                htmlFor="email"
+                className="block text-zinc-800 dark:text-zinc-200 text-[15px] font-bold mb-2.5"
+              >
+                Email
               </label>
-              <input
-                id="email"
-                type="email"
-                placeholder={t.emailPlaceholder}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-                className="w-full bg-white border border-zinc-200 text-zinc-900 placeholder-zinc-400 rounded-[8px] px-4 py-2.5 text-[15px] focus:outline-none focus:ring-2 transition-colors"
-                style={{ ["--tw-ring-color" as string]: "#7B2FF7" }}
-                onFocus={e => e.target.style.borderColor = "#7B2FF7"}
-                onBlur={e => e.target.style.borderColor = ""}
-              />
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-violet-600">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                    <path d="M22 6l-10 7L2 6" />
+                  </svg>
+                </span>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                  className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 rounded-[8px] pl-12 pr-4 py-2.5 text-[15px] focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 dark:focus:ring-violet-900 transition-colors"
+                />
+              </div>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-zinc-800 text-[15px] font-semibold mb-2">
-                {t.passwordLabel}
-              </label>
+              <div className="flex items-center justify-between mb-2.5">
+                <label htmlFor="password" className="text-zinc-800 dark:text-zinc-200 text-[15px] font-bold">
+                  Password
+                </label>
+              </div>
               <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-violet-600">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" />
+                    <path d="M7 11V7a5 5 0 0110 0v4" />
+                  </svg>
+                </span>
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder={t.passwordPlaceholder}
+                  placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   autoComplete="current-password"
-                  className="w-full bg-white border border-zinc-200 text-zinc-900 placeholder-zinc-400 rounded-[8px] px-4 pr-12 py-2.5 text-[15px] focus:outline-none focus:ring-2 transition-colors"
-                  onFocus={e => e.target.style.borderColor = "#7B2FF7"}
-                  onBlur={e => e.target.style.borderColor = ""}
+                  className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 rounded-[8px] pl-12 pr-12 py-2.5 text-[15px] focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 dark:focus:ring-violet-900 transition-colors"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors"
-                  aria-label={showPassword ? t.hidePassword : t.showPassword}
+                  aria-label={showPassword ? "পাসওয়ার্ড লুকান" : "পাসওয়ার্ড দেখান"}
                 >
                   {showPassword ? (
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -229,43 +249,34 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Forgot password — বেগুনি */}
             <div className="text-right">
               <Link
                 href="/forgot-password"
-                className="text-[14px] font-medium hover:underline underline-offset-2 transition-colors"
-                style={{ color: "#7B2FF7" }}
+                className="text-violet-600 text-[15px] font-medium hover:text-violet-700 transition-colors"
               >
-                {t.forgotPassword}
+                Forgot password?
               </Link>
             </div>
 
-            {/* Login button — বেগুনি gradient */}
             <button
               type="submit"
               disabled={loading}
-              className="block mx-auto w-full max-w-[280px] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-[8px] py-3 text-base transition-opacity"
-              style={{ background: "linear-gradient(to right, #6A11CB, #7B2FF7, #A855F7)" }}
+              className="w-full bg-violet-600 hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-[8px] py-3 text-base transition-colors"
             >
-              {loading ? t.loggingIn : t.loginButton}
+              {loading ? "Logging in..." : "Login"}
             </button>
           </form>
 
-          {/* OR divider */}
-          <div className="flex items-center gap-3 my-4">
-            <div className="flex-1 h-px bg-zinc-200" />
-            <span className="text-zinc-400 text-xs font-medium">or</span>
-            <div className="flex-1 h-px bg-zinc-200" />
-          </div>
-
-          {/* Create new account — হালকা বেগুনি stroke, চিকন, বেগুনি টেক্সট */}
-          <Link
-            href="/signup"
-            className="flex items-center justify-center w-full font-semibold rounded-full py-2.5 text-[15px] transition-colors hover:bg-purple-50"
-            style={{ border: "1px solid #C084FC", color: "#7B2FF7" }}
-          >
-            Create new account
-          </Link>
+          {/* Sign up link */}
+          <p className="text-center text-zinc-400 dark:text-zinc-500 text-[15px] mt-6">
+            Don&apos;t have an account?{" "}
+            <Link
+              href="/signup"
+              className="text-violet-600 hover:text-violet-700 font-bold transition-colors"
+            >
+              Sign up
+            </Link>
+          </p>
 
         </div>
       </div>
