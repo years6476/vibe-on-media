@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Vibe — Connect, Share, Feel the Vibe",
+  title: "SocialFeed — Connect, Share, Stay Updated",
   description:
-    "Vibe is a social platform to share moments, connect with friends, and feel the vibe of your community.",
+    "SocialFeed is a social platform to share moments, connect with friends, and stay updated with your community.",
 };
 
 export default function RootLayout({
@@ -13,8 +13,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" className="h-full">
+      <body className="h-full">{children}</body>
     </html>
   );
 }
