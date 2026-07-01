@@ -23,7 +23,10 @@ export default function LoginPage() {
   );
 
   const t = getTranslation(selectedCountry.langCode);
-  const isRtl = selectedCountry.langCode === "ar" || selectedCountry.langCode === "ur" || selectedCountry.langCode === "fa";
+  const isRtl =
+    selectedCountry.langCode === "ar" ||
+    selectedCountry.langCode === "ur" ||
+    selectedCountry.langCode === "fa";
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -56,18 +59,24 @@ export default function LoginPage() {
       {/* Top bar */}
       <div className="w-full max-w-2xl mx-auto px-5 sm:px-8 pt-4 flex items-center justify-between">
 
-        {/* Help — সার্কল ছোট, ? বড়, opacity বেশি, hover এ underline */}
+        {/* Help */}
         <Link
           href="/help"
           className="flex items-center gap-1.5 text-zinc-700 hover:text-zinc-900 transition-colors group"
         >
           <span className="flex items-center justify-center w-6 h-6 rounded-full border-2 border-zinc-500 bg-zinc-50">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              width="17" height="17" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor"
+              strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+            >
               <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
               <circle cx="12" cy="17" r="0.6" fill="currentColor" />
             </svg>
           </span>
-          <span className="text-sm font-medium group-hover:underline underline-offset-2">{t.help}</span>
+          <span className="text-sm font-medium group-hover:underline underline-offset-2">
+            {t.help}
+          </span>
         </Link>
 
         {/* Language selector */}
@@ -84,7 +93,8 @@ export default function LoginPage() {
             </svg>
             <span className="text-xs font-medium">{selectedCountry.label}</span>
             <svg
-              width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+              width="12" height="12" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" strokeWidth="2"
               className={`transition-transform flex-shrink-0 ${langOpen ? "rotate-180" : ""}`}
             >
               <polyline points="6 9 12 15 18 9" />
@@ -101,7 +111,9 @@ export default function LoginPage() {
                     type="button"
                     onClick={() => { setSelectedCountry(country); setLangOpen(false); }}
                     className={`w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-50 transition-colors leading-tight ${
-                      country.code === selectedCountry.code ? "text-violet-600 font-semibold" : "text-zinc-700"
+                      country.code === selectedCountry.code
+                        ? "text-violet-600 font-semibold"
+                        : "text-zinc-700"
                     }`}
                   >
                     <span className="font-medium">{country.country}</span>
@@ -114,25 +126,26 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col items-center px-6 sm:px-8 pt-1 sm:pt-2">
+      {/* Main content — pt-0 যাতে একদম উপর থেকে শুরু */}
+      <div className="flex-1 flex flex-col items-center px-6 sm:px-8 pt-0">
         <div className="w-full max-w-[380px]">
 
-          {/* Logo */}
-          <div className="text-center mt-4 mb-3">
+          {/* Logo — mt-0, unoptimized দিয়ে progressive loading সমস্যা fix */}
+          <div className="text-center mt-0 mb-2">
             <Image
               src="/vibe-logo.png"
               alt="Vibe"
-              width={440}
-              height={220}
+              width={240}
+              height={120}
               priority
-              sizes="(max-width: 640px) 210px, 240px"
-              className="mx-auto w-[210px] sm:w-[240px] aspect-[2/1] object-contain"
+              unoptimized
+              style={{ height: "auto" }}
+              className="mx-auto w-[210px] sm:w-[240px]"
             />
           </div>
 
-          {/* Welcome text */}
-          <div className="text-center mb-6 -mt-1">
+          {/* Welcome text — লোগোর ঠিক নিচে */}
+          <div className="text-center mb-5">
             <h1 className="text-zinc-900 text-[22px] sm:text-[24px] font-semibold tracking-tight">
               {t.welcomeTitle}
             </h1>
@@ -143,7 +156,7 @@ export default function LoginPage() {
 
           {/* Error */}
           {error && (
-            <div className="bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-4 py-3 mb-5">
+            <div className="bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-4 py-3 mb-4">
               {error}
             </div>
           )}
@@ -217,7 +230,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Forgot password — hover এ underline */}
+            {/* Forgot password */}
             <div className="text-right">
               <Link
                 href="/forgot-password"
