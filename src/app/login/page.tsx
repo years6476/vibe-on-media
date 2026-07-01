@@ -131,19 +131,26 @@ export default function LoginPage() {
       <div className="flex-1 flex flex-col items-center px-6 sm:px-8 pt-14">
         <div className="w-full max-w-[380px]">
 
+   
           {/* Logo */}
-          <div className="text-center mb-2">
-            <Image
-              src="/vibe-logo.png"
-              alt="Vibe"
-              width={240}
-              height={120}
-              priority
-              unoptimized
-              style={{ height: "auto" }}
-              className="mx-auto w-[210px] sm:w-[240px]"
-            />
-          </div>
+<div className="text-center mt-2 mb-4">
+  <Image
+    src="/socialfeed-logo-light.png"
+    alt="SocialFeed"
+    width={300}
+    height={150}
+    priority
+    className="mx-auto h-auto w-[150px] sm:w-[170px] dark:hidden"
+  />
+  <Image
+    src="/socialfeed-logo-dark.png"
+    alt="SocialFeed"
+    width={300}
+    height={150}
+    priority
+    className="mx-auto h-auto w-[150px] sm:w-[170px] hidden dark:block"
+  />
+</div>
 
           {/* Welcome text */}
           <div className="text-center mb-5">
