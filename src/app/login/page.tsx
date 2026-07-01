@@ -19,7 +19,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<CountryOption>(
-    COUNTRIES.find((c) => c.code === "bd") ?? COUNTRIES[0]
+    COUNTRIES.find((c) => c.code === "us") ?? COUNTRIES[0]
   );
 
   const t = getTranslation(selectedCountry.langCode);
@@ -59,14 +59,14 @@ export default function LoginPage() {
       {/* Top bar */}
       <div className="w-full max-w-2xl mx-auto px-5 sm:px-8 pt-4 flex items-center justify-between">
 
-        {/* Help */}
+        {/* Help — question mark বড় */}
         <Link
           href="/help"
           className="flex items-center gap-1.5 text-zinc-700 hover:text-zinc-900 transition-colors group"
         >
           <span className="flex items-center justify-center w-6 h-6 rounded-full border-2 border-zinc-500 bg-zinc-50">
             <svg
-              width="17" height="17" viewBox="0 0 24 24"
+              width="20" height="20" viewBox="0 0 24 24"
               fill="none" stroke="currentColor"
               strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
             >
@@ -112,9 +112,10 @@ export default function LoginPage() {
                     onClick={() => { setSelectedCountry(country); setLangOpen(false); }}
                     className={`w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-50 transition-colors leading-tight ${
                       country.code === selectedCountry.code
-                        ? "text-violet-600 font-semibold"
+                        ? "font-semibold"
                         : "text-zinc-700"
                     }`}
+                    style={country.code === selectedCountry.code ? { color: "#7B2FF7" } : {}}
                   >
                     <span className="font-medium">{country.country}</span>
                     <span className="text-zinc-400 ml-1">({country.label})</span>
@@ -126,12 +127,12 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Main content — pt-0 যাতে একদম উপর থেকে শুরু */}
-      <div className="flex-1 flex flex-col items-center px-6 sm:px-8 pt-0">
+      {/* Main content — একটু নিচে */}
+      <div className="flex-1 flex flex-col items-center px-6 sm:px-8 pt-6">
         <div className="w-full max-w-[380px]">
 
-          {/* Logo — mt-0, unoptimized দিয়ে progressive loading সমস্যা fix */}
-          <div className="text-center mt-0 mb-2">
+          {/* Logo */}
+          <div className="text-center mb-2">
             <Image
               src="/vibe-logo.png"
               alt="Vibe"
@@ -144,7 +145,7 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* Welcome text — লোগোর ঠিক নিচে */}
+          {/* Welcome text */}
           <div className="text-center mb-5">
             <h1 className="text-zinc-900 text-[22px] sm:text-[24px] font-semibold tracking-tight">
               {t.welcomeTitle}
@@ -167,24 +168,19 @@ export default function LoginPage() {
               <label htmlFor="email" className="block text-zinc-800 text-[15px] font-semibold mb-2">
                 {t.emailLabel}
               </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-900">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="2" y="4" width="20" height="16" rx="2" />
-                    <path d="M22 6l-10 7L2 6" />
-                  </svg>
-                </span>
-                <input
-                  id="email"
-                  type="email"
-                  placeholder={t.emailPlaceholder}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoComplete="email"
-                  className="w-full bg-white border border-zinc-200 text-zinc-900 placeholder-zinc-400 rounded-[8px] pl-12 pr-4 py-2.5 text-[15px] focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-colors"
-                />
-              </div>
+              <input
+                id="email"
+                type="email"
+                placeholder={t.emailPlaceholder}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+                className="w-full bg-white border border-zinc-200 text-zinc-900 placeholder-zinc-400 rounded-[8px] px-4 py-2.5 text-[15px] focus:outline-none focus:ring-2 transition-colors"
+                style={{ ["--tw-ring-color" as string]: "#7B2FF7" }}
+                onFocus={e => e.target.style.borderColor = "#7B2FF7"}
+                onBlur={e => e.target.style.borderColor = ""}
+              />
             </div>
 
             <div>
@@ -192,12 +188,6 @@ export default function LoginPage() {
                 {t.passwordLabel}
               </label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-900">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="3" y="11" width="18" height="11" rx="2" />
-                    <path d="M7 11V7a5 5 0 0110 0v4" />
-                  </svg>
-                </span>
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
@@ -206,7 +196,9 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   autoComplete="current-password"
-                  className="w-full bg-white border border-zinc-200 text-zinc-900 placeholder-zinc-400 rounded-[8px] pl-12 pr-12 py-2.5 text-[15px] focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-colors"
+                  className="w-full bg-white border border-zinc-200 text-zinc-900 placeholder-zinc-400 rounded-[8px] px-4 pr-12 py-2.5 text-[15px] focus:outline-none focus:ring-2 transition-colors"
+                  onFocus={e => e.target.style.borderColor = "#7B2FF7"}
+                  onBlur={e => e.target.style.borderColor = ""}
                 />
                 <button
                   type="button"
@@ -230,21 +222,25 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Forgot password */}
+            {/* Forgot password — বেগুনি */}
             <div className="text-right">
               <Link
                 href="/forgot-password"
-                className="text-zinc-900 text-[14px] font-medium hover:underline underline-offset-2 transition-colors"
+                className="text-[14px] font-medium hover:underline underline-offset-2 transition-colors"
+                style={{ color: "#7B2FF7" }}
               >
                 {t.forgotPassword}
               </Link>
             </div>
 
-            {/* Login button */}
+            {/* Login button — বেগুনি gradient */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-zinc-900 hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-[8px] py-3 text-base transition-colors"
+              className="w-full disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-[8px] py-3 text-base transition-opacity"
+              style={{
+                background: "linear-gradient(to right, #6A11CB, #7B2FF7, #A855F7)",
+              }}
             >
               {loading ? t.loggingIn : t.loginButton}
             </button>
@@ -257,10 +253,14 @@ export default function LoginPage() {
             <div className="flex-1 h-px bg-zinc-200" />
           </div>
 
-          {/* Create new account */}
+          {/* Create new account — হালকা বেগুনি stroke, চিকন, বেগুনি টেক্সট */}
           <Link
             href="/signup"
-            className="flex items-center justify-center w-full border-2 border-zinc-200 hover:border-zinc-400 text-zinc-800 font-semibold rounded-full py-2.5 text-[15px] transition-colors hover:bg-zinc-50"
+            className="flex items-center justify-center w-full font-semibold rounded-full py-2.5 text-[15px] transition-colors hover:bg-purple-50"
+            style={{
+              border: "1px solid #A855F7",
+              color: "#7B2FF7",
+            }}
           >
             Create new account
           </Link>
